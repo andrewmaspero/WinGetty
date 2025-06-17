@@ -1,41 +1,40 @@
-# Use an official Python runtime as the base image
-FROM python:3.9-alpine
-
-# Set the working directory in the container
+# ---------- Builder Stage ---------- #
+FROM ghcr.io/astral-sh/uv:python3.13-alpine AS builder
 WORKDIR /app
 
-# Copy the requirements file into the container
-COPY requirements.txt .
+# install build-deps
+RUN apk add --no-cache gcc musl-dev python3-dev linux-headers
 
-RUN apk add --no-cache build-base openssl-dev libffi-dev
-# Install the Python dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+# copy and install your Python dependencies
+COPY pyproject.toml uv.lock* ./
+RUN uv sync
 
-# Copy the Flask app code into the container
-COPY app/ app/
-COPY tailwind.config.js .
-COPY package.json .
-COPY package-lock.json .
-COPY src/ src/ 
-COPY settings.toml .
-COPY config.py .
-COPY migrations/ migrations/
-COPY start.sh .
+# Download & unpack Node Exporter
+ARG NODE_EXPORTER_VERSION=1.9.1
+ARG TARGETARCH
+RUN wget -qO- \
+    https://github.com/prometheus/node_exporter/releases/download/v${NODE_EXPORTER_VERSION}/node_exporter-${NODE_EXPORTER_VERSION}.linux-${TARGETARCH}.tar.gz \
+    | tar xz --strip-components=1 -C /usr/local/bin node_exporter-${NODE_EXPORTER_VERSION}.linux-${TARGETARCH}/node_exporter
 
-RUN ["chmod", "+x", "./start.sh"]
+# ---------- Production Stage ---------- #
+FROM ghcr.io/astral-sh/uv:python3.13-alpine AS production
+WORKDIR /app
 
-# Set the environment variables
-ENV FLASK_APP=app
-ENV FLASK_ENV=production
+# bring in virtualenv and Node Exporter
+COPY --from=builder /app/.venv /app/.venv
+COPY --from=builder /usr/local/bin/node_exporter /usr/local/bin/node_exporter
 
-# Build the CSS using Tailwind
-RUN apk update && apk add --no-cache nodejs npm && apk add tzdata
-RUN npm ci
-RUN npm run build:css
+# copy your app
+COPY app/ /app/app/
+COPY tailwind.config.js package.json package-lock.json ./
+COPY src/ /app/src/
+COPY settings.toml config.py ./
+COPY migrations/ /app/migrations/
+COPY start.sh ./
+RUN chmod +x start.sh
 
+ENV PATH="/app/.venv/bin:$PATH"
+EXPOSE 8080 9100
 
-# Expose port 8080 for Gunicorn
-EXPOSE 8080
-
-# Start the app using Gunicorn boot.sh
-ENTRYPOINT ["./start.sh"]
+# launch both Node Exporter and your app
+CMD ["./start.sh"]
