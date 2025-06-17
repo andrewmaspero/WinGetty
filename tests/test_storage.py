@@ -3,6 +3,8 @@ import sys
 from pathlib import Path
 from types import SimpleNamespace
 
+pytest_plugins = ["pytest_asyncio"]
+
 import pytest
 
 MODULE_PATH = Path(__file__).resolve().parents[1] / "app" / "storage.py"

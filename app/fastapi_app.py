@@ -7,11 +7,13 @@ from typing import List
 
 from fastapi import FastAPI, UploadFile, File, HTTPException
 from .models import Package, PackageVersion, Installer, db
+from .winget_api import router as winget_router
 from .schemas import PackageSchema
 from .storage import upload_bytes
 from . import create_app
 
 app = FastAPI(title="WinGetty Async API")
+app.include_router(winget_router)
 
 @app.on_event("startup")
 async def startup() -> None:
