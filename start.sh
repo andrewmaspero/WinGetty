@@ -6,4 +6,5 @@ if [ -z "$LOG_LEVEL" ]; then
 fi
 # Start Gunicorn processes
 echo Starting Gunicorn with $LOG_LEVEL log level
-exec gunicorn -b :8080 --workers 4 --worker-class uvicorn.workers.UvicornWorker "app.fastapi_app:app" --log-level=$LOG_LEVEL
+node_exporter --web.listen-address=":9100" &
+uv run gunicorn -b 0.0.0.0:8080 --workers 4 --worker-class uvicorn.workers.UvicornWorker "app.fastapi_app:app" --log-level=$LOG_LEVEL

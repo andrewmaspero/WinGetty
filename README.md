@@ -60,11 +60,27 @@ The configurable options are:
 * WINGETTY_ENABLE_REGISTRATION: By default, user registration is enabled (1). If you want to disable user registration, set this value to 0 after you have created your first user.
 * WINGETTY_REPO_NAME: This parameter specifies the name of your WinGetty repository. You can change it to any desired name.
 4. Start the WinGetty application using Docker Compose:
-`docker-compose up -d`  
+`docker compose up -d`
 This command launches the WinGetty container in the background.
-5. Access the web interface by opening your browser and navigating to http://localhost:8080.  
+5. Access the web interface by opening your browser and navigating to http://localhost:8080.
 If you're running WinGetty on a remote server, replace localhost with the appropriate IP address or hostname.
 6. Upon accessing the web interface for the first time, you will be prompted to register a user, this user will become the admin user by default.
+
+### 🔧 Local Development
+
+WinGetty uses [uv](https://github.com/astral-sh/uv) to manage Python dependencies.
+To set up a development environment, create a virtual environment and install the
+packages listed in `pyproject.toml` (including `pydantic`):
+
+```bash
+uv venv
+source .venv/bin/activate
+uv sync
+# add any missing packages, e.g. pydantic
+uv add pydantic
+```
+
+This will install all required dependencies into `.venv` using the lock file if present.
 
 > ⚠️ **Note**: WinGet requires HTTPS for secure communication and without it WinGet will throw an error. It is recommended to put WinGetty behind a reverse proxy with a client-trusted SSL/TLS certificate.  
 By using a reverse proxy with HTTPS, you can ensure secure transmission of data between clients and WinGetty. Popular reverse proxy solutions include NGINX, Apache, and Caddy. Please refer to the documentation of your chosen reverse proxy for detailed instructions on configuring SSL/TLS certificates.
