@@ -53,13 +53,39 @@ def create_settings():
             "position": 2,
         },
         {
+            "name": "Use Azure Blob Storage",
+            "description": "Store installers in Azure Blob Storage instead of the local container.",
+            "key": "use_azure",
+            "type": "boolean",
+            "value": "False",
+            "position": 3,
+        },
+        {
             "name": "S3 bucket",
             "description": "The name of the S3 bucket to use.",
             "key": "bucket_name",
             "type": "string",
             "value": "",
             "depends_on": "use_s3",
-            "position": 3,
+            "position": 4,
+        },
+        {
+            "name": "Azure container",
+            "description": "The Azure Blob container name.",
+            "key": "azure_container",
+            "type": "string",
+            "value": "",
+            "depends_on": "use_azure",
+            "position": 5,
+        },
+        {
+            "name": "Azure connection string",
+            "description": "Connection string for Azure Blob Storage.",
+            "key": "azure_connection_string",
+            "type": "string",
+            "value": "",
+            "depends_on": "use_azure",
+            "position": 6,
         },
         {
             "name": "Enable uplink (W.I.P.)",
@@ -67,7 +93,7 @@ def create_settings():
             "key": "enable_uplink",
             "type": "boolean",
             "value": "False",
-            "position": 4,
+            "position": 7,
         },
         {
             "name": "Uplink URL",
@@ -76,7 +102,7 @@ def create_settings():
             "type": "string",
             "value": "",
             "depends_on": "enable_uplink",
-            "position": 5,
+            "position": 8,
         },
     ]
 
