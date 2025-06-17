@@ -54,3 +54,10 @@ WTForms==3.0.1
 zipp==3.15.0
 zope.event==5.0
 zope.interface==6.1
+fastapi==0.103.2
+uvicorn==0.23.2
+azure-storage-blob==12.16.0
+azure-storage-file-share==12.14.1
+python-multipart==0.0.9
+pytest==8.0.0
+pytest-asyncio==0.23.5
